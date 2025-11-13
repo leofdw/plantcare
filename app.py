@@ -231,6 +231,7 @@ def api_add_plant():
 
 #удаление растения с сайта(только для админов)
 @app.route('/api/delete-plant/<int:plant_id>', methods=['DELETE'])
+@login_required
 def api_delete_plant(plant_id):
     if (current_user.is_admin):
         plant = Plant.query.get(plant_id)
@@ -443,6 +444,7 @@ def save_fertilization():
 if __name__ == '__main__':
 
     app.run()
+
 
 
 
