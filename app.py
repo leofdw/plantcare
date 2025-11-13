@@ -374,8 +374,7 @@ def api_fertilization_schedule():
         return jsonify(events)
 
     except Exception as e:
-        print(f"[API] fertilization schedule error: {e}")
-        return jsonify([]), 500
+        return jsonify(['success':False, 'message': f'Ошибка при загрузки графика']), 500
 
 #апи для сохранения графика удобрений
 @app.route('/api/save-fertilization', methods=['POST'])
@@ -422,14 +421,13 @@ def save_fertilization():
 
         return jsonify({
             'success': True,
-            'message': f'✅ Удобрение для "{plant_name}" установлено (каждые {repeat_days} дн.)'
+            'message': f'Удобрение для "{plant_name}" установлено (каждые {repeat_days} дней)'
         })
 
     except Exception as e:
-        db.session.rollback()
-        print(f"[ERROR] save_fertilization: {e}")
-        return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
+        return jsonify({'success': False, 'message': f'Ошибка при сохранении графика'}), 500
 if __name__ == '__main__':
 
     app.run()
+
 
