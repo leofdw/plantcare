@@ -229,6 +229,20 @@ def api_add_plant():
         except Exception as e:
             jsonify({'success':False, 'message':f'Ошибка БД: {str(e)}'}), 500
 
+#удаление растения с сайта(только для админов)
+@app.route('/api/delete-plant/<int:plant_id>', methods=['DELETE'])
+def api_delete_plant(plant_id):
+    if (current_user.is_admin):
+        plant = Plant.query.get(plant_id)
+        if not plant:
+            return jsonify({'success':False, 'message':'Растение не найдено'}), 404
+        try:
+            db.session.delete(plant)
+            db.session.commit()
+            return jsonify({'success':True, 'message':f'Растение {plant.name} удалено'})
+        except Exception as e:
+            return jsonify({'success':False, 'message':f'Ошибка БД: {str(e)}'}), 500
+
 #график
 @app.route('/calendar')
 @login_required
@@ -429,6 +443,7 @@ def save_fertilization():
 if __name__ == '__main__':
 
     app.run()
+
 
 
 
