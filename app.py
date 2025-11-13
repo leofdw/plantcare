@@ -360,14 +360,14 @@ def api_fertilization_schedule():
         ).all()
 
         events = []
-        for s in schedules:
-            plant = Plant.query.get(s.plant_id)
+        for schedule in schedules:
+            plant = Plant.query.get(schedule.plant_id)
             if plant:
                 events.append({
-                    'date': s.date.isoformat(),
-                    'plant_id': s.plant_id,
+                    'date': schedule.date.isoformat(),
+                    'plant_id': schedule.plant_id,
                     'plant_name': plant.name,
-                    'repeat_interval': s.repeat_interval,
+                    'repeat_interval': schedule.repeat_interval,
                     'type': 'fertilization'
                 })
 
@@ -408,11 +408,11 @@ def save_fertilization():
             events.append(current_date)
             current_date += timedelta(days=repeat_days)
 
-        for d in events:
+        for date in events:
             fert = FertilizationSchedule(
                 user_id=current_user.id,
                 plant_id=plant_id,
-                date=d,
+                date=date,
                 repeat_interval=repeat_days
             )
             db.session.add(fert)
@@ -432,3 +432,4 @@ def save_fertilization():
 if __name__ == '__main__':
 
     app.run()
+
