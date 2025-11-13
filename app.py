@@ -430,4 +430,4 @@ def save_fertilization():
         print(f"[ERROR] save_fertilization: {e}")
         return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
