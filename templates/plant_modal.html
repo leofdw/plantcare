@@ -274,18 +274,16 @@
         const modal = document.getElementById('plantModal');
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('active'), 10);
-    }
-    // Обработчик для кнопки "Добавить в график"
-    // ДОБАВИТЬ АВТОЗАПОЛНЕНИЕ!!
-    document.getElementById('plantModal').addEventListener('click', function(e) {
-        window.location.href = '/calendar';
-    });
 
+        const addToCalendarBtn = document.querySelector('.add-to-calendar');
+        addToCalendarBtn.addEventListener('click', function () {
+            window.location.href = `/calendar`;
+        });
+    }
 
     // === Закрытие модального окна ===
     const modal = document.getElementById('plantModal');
     const closeBtn = document.querySelector('.close-new');
-
     closeBtn.addEventListener('click', () => {
         modal.classList.remove('active');
         setTimeout(() => {
