@@ -374,7 +374,7 @@ def api_fertilization_schedule():
         return jsonify(events)
 
     except Exception as e:
-        return jsonify(['success':False, 'message': f'Ошибка при загрузки графика']), 500
+        return jsonify({'success': False, 'message': f'Ошибка при загрузки графика'}), 500
 
 #апи для сохранения графика удобрений
 @app.route('/api/save-fertilization', methods=['POST'])
@@ -429,5 +429,6 @@ def save_fertilization():
 if __name__ == '__main__':
 
     app.run()
+
 
 
