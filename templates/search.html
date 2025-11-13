@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Поиск растений — PlantCare{% endblock %}
+
+{% block body %}
+<section class="search-section">
+    <div class="container">
+        <h2>Поиск растения по фото</h2>
+        <p>Загрузите одно или несколько фото растения (до 5 штук). Мы определим вид с помощью интеллектуального анализа.</p>
+
+        <div class="upload-area" id="uploadArea">
+            <p>📁 Перетащите сюда или кликните, чтобы выбрать</p>
+            <input type="file" id="fileInput" accept="image/*" multiple>
+        </div>
+
+        <div class="preview-container" id="previewContainer">
+            <!-- Превью изображений -->
+        </div>
+
+        <button class="btn btn-primary" id="searchBtn" disabled>🔍 Найти растение</button>
+
+        <div id="loading" style="display: none; text-align: center; margin: 1.5rem 0;">
+            <p>Идёт анализ изображений...</p>
+        </div>
+    </div>
+</section>
+
+<section class="results-section" id="resultsSection" style="display: none;">
+    <div class="container">
+        <h2>Результаты поиска</h2>
+        <div class="results-grid" id="resultsGrid">
+            <!-- Сюда вставятся результаты -->
+        </div>
+    </div>
+</section>
+
+<style>
+    .search-section, .results-section {
+        padding: 4rem 0;
+        background: var(--white);
+    }
+
+    .search-section h2, .results-section h2 {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .search-section p {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        color: var(--text-light);
+        font-size: 1rem;
+    }
+
+    .upload-area {
+        border: 2px dashed #ccc;
+        border-radius: var(--radius);
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.3s;
+        margin-bottom: 1.5rem;
+    }
+
+    .upload-area:hover, .upload-area.drag-over {
+        border-color: var(--primary);
+    }
+
+    .upload-area p {
+        margin: 0;
+        color: var(--text-light);
+        font-size: 1.1rem;
+    }
+
+    #fileInput {
+        display: none;
+    }
+
+    .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .preview-item {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .preview-remove {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(255, 0, 0, 0.8);
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    #searchBtn {
+        display: block;
+        margin: 0 auto;
+    }
+
+    #loading p {
+        color: var(--text-light);
+        font-style: italic;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .result-card {
+        background: var(--white);
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        transition: transform 0.2s ease;
+    }
+
+    .result-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .result-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .result-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+        color: var(--text);
+    }
+
+    .result-latin {
+        font-style: italic;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .result-probability {
+        background: #e8f5e9;
+        color: var(--primary);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+        align-self: flex-start;
+    }
+
+    .no-results {
+        text-align: center;
+        color: var(--text-light);
+        font-style: italic;
+        margin: 2rem 0;
+    }
+
+    .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+        text-align: center;
+        font-size: 0.95rem;
+    }
+        .btn-website {
+        margin-top: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    .btn-website:hover {
+        background: #4caf50 !important;
+        color: white !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewContainer = document.getElementById('previewContainer');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const loading = document.getElementById('loading');
+
+        let files = [];
+
+        // Открыть проводник
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // Перетаскивание
+        ['dragover', 'dragenter'].forEach(evt => {
+            uploadArea.addEventListener(evt, e => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach(evt => {
+            uploadArea.addEventListener(evt, () => {
+                uploadArea.classList.remove('drag-over');
+            });
+        });
+
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            const newFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            addFiles(newFiles);
+        });
+
+        fileInput.addEventListener('change', () => {
+            const newFiles = Array.from(fileInput.files).filter(f => f.type.startsWith('image/'));
+            addFiles(newFiles);
+        });
+
+        function addFiles(newFiles) {
+            const remaining = 5 - files.length;
+            if (newFiles.length > remaining) {
+                showAlert(`Можно загрузить не больше 5 фото. Доступно: ${remaining}`);
+            }
+            files.push(...newFiles.slice(0, remaining));
+            updatePreview();
+            searchBtn.disabled = files.length === 0;
+        }
+
+        function updatePreview() {
+            previewContainer.innerHTML = '';
+            files.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                item.appendChild(img);
+
+                const removeBtn = document.createElement('div');
+                removeBtn.className = 'preview-remove';
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => {
+                    files.splice(index, 1);
+                    updatePreview();
+                    searchBtn.disabled = files.length === 0;
+                });
+                item.appendChild(removeBtn);
+
+                previewContainer.appendChild(item);
+            });
+        }
+
+        function showAlert(message) {
+            const alert = document.createElement('div');
+            alert.className = 'upload-alert';
+            alert.textContent = message;
+
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #ffebee;
+                color: #c62828;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 0.95rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                border: 1px solid #ffcdd2;
+                animation: slideDown 0.3s ease;
+            `;
+
+            document.body.appendChild(alert);
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }, 4000);
+        }
+
+        // Поиск растения
+        searchBtn.addEventListener('click', async () => {
+            const formData = new FormData();
+            files.forEach(file => formData.append('images', file));
+
+            // Показываем индикатор загрузки
+            loading.style.display = 'block';
+            resultsSection.style.display = 'none';
+            resultsGrid.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                loading.style.display = 'none';
+
+                if (data.error) {
+                    resultsGrid.innerHTML = `<div class="error-message">${data.error}</div>`;
+                    resultsSection.style.display = 'block';
+                    return;
+                }
+
+                if (!data.plants || data.plants.length === 0) {
+                    resultsGrid.innerHTML = `<div class="no-results">Растения не распознаны. Попробуйте другие фото.</div>`;
+                } else {
+                    resultsGrid.innerHTML = '';
+                    data.plants.forEach((plant, index) => {
+                        const isTop = index === 0;
+                        const badge = isTop
+                            ? '<div class="result-probability" style="background: #4caf50; color: white;">Наиболее вероятно</div>'
+                            : `<div class="result-probability">Вероятность: ${plant.probability}</div>`;
+
+                        const card = document.createElement('div');
+                        card.className = 'result-card';
+                        card.innerHTML = `
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="font-size: 2.5rem; color: #4caf50;">🌿</div>
+                                <div class="result-info">
+                                    <div class="result-name">${plant.name}</div>
+                                    <div class="result-latin">${plant.latin}</div>
+                                    ${badge}
+                                    <button class="btn-website btn-outline" data-name="${plant.name}">
+                                        🌐 Найти на сайте
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        resultsGrid.appendChild(card);
+                        // Добавляем обработчик для кнопки "Найти на сайте"
+                        card.querySelector('.btn-website').addEventListener('click', function () {
+                            const plantName = this.getAttribute('data-name');
+                            const firstName = plantName.split(' ')[0];
+                            // Кодируем имя для URL
+                            const encodedName = encodeURIComponent(firstName);
+                            // Переход на /plants с параметром поиска
+                            window.location.href = `/plants?search=${encodedName}`;
+                        });
+                    });
+                }
+
+                resultsSection.style.display = 'block';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                loading.style.display = 'none';
+                resultsGrid.innerHTML = '<div class="error-message">Ошибка сети. Проверьте подключение.</div>';
+                resultsSection.style.display = 'block';
+            }
+        });
+    });
+</script>
+{% endblock %}

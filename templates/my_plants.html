@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block title %}Мои растения - PlantCare{% endblock %}
+
+{% block body %}
+<!-- Основной контент -->
+<div class="my-plants-container">
+    <div class="container">
+        <!-- Заголовок и поиск -->
+        <div class="my-plants-header">
+            <div class="header-content">
+                <div>
+                    <h1>Мои растения</h1>
+                    <p>Ваша личная коллекция растений</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Поиск -->
+        <div class="search-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="plantSearch" placeholder="Поиск по вашим растениям...">
+            </div>
+        </div>
+
+        <!-- Сетка растений -->
+        <div class="my-plants-grid" id="plantsGrid">
+            {% for plant in user_plants %}
+            <div class="plant-card" 
+                    data-name="{{ plant.name }}"
+                    data-latin="{{ plant.latin_name }}"
+                    data-image="{{ plant.image_url }}"
+                    data-difficulty="{{ plant.difficulty }}"
+                    data-type="{{ plant.plant_type }}"
+                    data-lifespan="{{ plant.lifespan }}"
+                    data-light="{{ plant.light }}"
+                    data-water="{{ plant.water_frequency }}"
+                    data-description="{{ plant.description }}"
+                    data-additional-care="{{ plant.care_instructions }}"
+                    data-temperature="{{ plant.temperature }}">
+                <div class="my-plant-image" style="background-image: url('{{ plant.image_url }}');">
+                    <button class="favorite-btn active" data-plant-id="{{ plant.id }}">♥</button>
+                    <div class="my-plant-care-level" data-difficulty="{{ plant.difficulty }}">
+                        {{ plant.difficulty|title }}
+                    </div>
+                </div>
+                <div class="my-plant-info">
+                    <h3>{{ plant.name }}</h3>
+                    <p class="my-plant-latin">{{ plant.latin_name }}</p>
+                    
+                    <!-- Убраны блоки с поливом и температурой -->
+                    
+                    <div class="my-plant-actions">
+                        <button class="btn-care btn-outline view-details" data-id="{{ plant.id }}">Подробнее</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="plant-card add-card" id="add-plant-card">
+                <div class="add-card-content">
+                    <div class="add-icon">+</div>
+                    <h3>Добавить растение</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Стили для страницы "Мои растения" */
+.add-icon {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.add-card:hover .add-icon {
+    color: #4caf50;
+}
+.add-card {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 200px;
+    height: 320px; /* Добавлено: фиксированная высота */
+    grid-row: span 1; /* Важно: не растягивать по строке */
+}
+
+.add-card:hover {
+    background: #e9ecef;
+    border-color: #4caf50;
+    transform: translateY(-2px);
+}
+
+.add-card-content {
+    text-align: center;
+    color: #6c757d;
+}
+.my-plants-container {
+    padding: 2rem 0;
+    background: var(--background);
+    min-height: 100vh;
+}
+
+.my-plants-header {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.my-plants-header h1 {
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+}
+
+.search-section {
+    margin-bottom: 2rem;
+}
+
+.search-box {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Сетка растений - 3 карточки в ряд */
+.my-plants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.plant-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f0f0f0;
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.plant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.my-plant-image {
+    height: 150px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #ff4757;
+    transition: all 0.3s ease;
+}
+
+.favorite-btn.active {
+    color: #ff4757;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 1);
+}
+
+.my-plant-care-level {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+.my-plant-care-level[data-difficulty="Лёгкий"] {
+    background: var(--primary);
+}
+
+.my-plant-care-level[data-difficulty="Средний"] {
+    background: #ff9800;
+}
+
+.my-plant-care-level[data-difficulty="Сложный"] {
+    background: #f44336;
+}
+
+.my-plant-info {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Равномерное распределение пространства */
+}
+
+.my-plant-info h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.my-plant-latin {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.my-plant-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.btn-care {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #4caf50;
+    color: #4caf50;
+}
+
+.btn-outline:hover {
+    background: #4caf50;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Пустое состояние */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    .my-plants-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .my-plants-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .plant-card {
+        height: 300px;
+    }
+    
+    .my-plant-image {
+        height: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    .my-plants-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .my-plants-header {
+        padding: 1.5rem;
+    }
+    
+    .search-box {
+        max-width: 100%;
+    }
+}
+</style>
+{% include "plant_modal.html" %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Элементы
+    const searchInput = document.getElementById('plantSearch');
+    const plantsGrid = document.getElementById('plantsGrid');
+    const plantCards = plantsGrid.querySelectorAll('.plant-card:not(.add-card)');
+
+    // Функция для показа уведомлений
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        const backgroundColor = type === 'success' ? 'var(--primary)' : '#f44336';
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${backgroundColor};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // Добавляем стили для анимации уведомлений
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Поиск растений
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        
+        plantCards.forEach(card => {
+            const plantName = card.querySelector('h3').textContent.toLowerCase();
+            const plantLatin = card.querySelector('.my-plant-latin').textContent.toLowerCase();
+            
+            const matchesSearch = plantName.includes(searchTerm) || 
+                                plantLatin.includes(searchTerm) ||
+                                searchTerm === '';
+            
+            card.style.display = matchesSearch ? 'flex' : 'none';
+        });
+    });
+
+    // Кнопки избранного - удаление из избранного
+    const favoriteBtns = document.querySelectorAll('.favorite-btn');
+    favoriteBtns.forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const plantId = this.dataset.plantId;
+            const plantName = this.closest('.plant-card').querySelector('h3').textContent;
+            
+            try {
+                const response = await fetch(`/api/remove-from-favorites/${plantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    // Удаляем карточку из DOM
+                    this.closest('.plant-card').remove();
+                    showNotification(result.message, 'success');
+                    
+                    // Если растений не осталось, показываем пустое состояние
+                    const remainingCards = document.querySelectorAll('.plant-card');
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Ошибка сети, попробуйте еще раз', 'error');
+                console.error('Ошибка:', error);
+            }
+        });
+    });
+
+    // Кнопки "Подробнее" - показываем полное модальное окно как в plants.html
+    const detailBtns = document.querySelectorAll('.view-details');
+    detailBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const plantId = this.dataset.id;
+            showPlantDetails(plantId);
+        });
+    });
+
+    async function setupAddPlantButton() {
+        const addButton = document.getElementById('add-plant-card');
+        addButton.onclick = function(){
+            window.location.href = '/plants';
+        }
+    }
+    setupAddPlantButton()
+});
+</script>
+
+{% endblock %}

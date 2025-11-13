@@ -1,0 +1,566 @@
+{% extends "base.html" %}
+
+{% block title %}PlantCare - Умный помощник для ваших растений{% endblock %}
+
+{% block body %}
+<!-- Герой секция -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Заботьтесь о растениях с умом</h1>
+                <p>Отслеживайте коллекцию, получайте напоминания о поливе, ведите дневник роста и находите решения проблем с растениями в одном приложении</p>
+                <div class="hero-buttons">
+                    {% if not current_user.is_authenticated %}
+                        <a href="#" class="btn btn-primary" id="startNowBtn">Начать сейчас</a>
+                    {% endif %}
+                    <a href="#features" class="btn btn-outline">Узнать больше</a>
+                </div>
+            </div>
+                <div class="hero-image">
+                    <div class="plant-card">
+                        <div class="plant-image" style="background-image: url('https://moi-rastenia.ru/wp-content/uploads/2016/12/kanadskaya-roza-CHampleyn.jpg');">
+                            <button class="favorite-btn" data-plant-id="1">
+                                ♥
+                            </button>
+                            <div class="plant-care-level" data-difficulty="Лёгкий">
+                                Лёгкий
+                            </div>
+                        </div>
+                        <div class="plant-info">
+                            <h3>Канадская роза</h3>
+                            <p class="plant-latin">Rosa 'Canadian Explorer'</p>
+                            
+                            <div class="plant-details-combined">
+                                <div class="detail-combined">
+                                    <div class="detail-icon">🌿</div>
+                                    <div class="detail-text">садовое</div>
+                                </div>
+                                <div class="detail-combined">
+                                    <div class="detail-icon">📅</div>
+                                    <div class="detail-text">многолетнее</div>
+                                </div>
+                            </div>
+                            
+                            <div class="plant-actions">
+                                <button class="btn-care btn-outline view-details" data-plant-id="1">Подробнее</button>
+                                <button class="btn-care btn-primary add-care" data-plant-id="1">Уход</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</section>
+
+<!-- Возможности -->
+<section id="features" class="features">
+    <div class="container">
+        <h2>Все для ухода за растениями</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h3>Коллекция растений</h3>
+                <p>Добавляйте растения в свою коллекцию с подробной информацией о каждом экземпляре</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Умные напоминания</h3>
+                <p>Получайте уведомления о времени полива, удобрения и других процедур по уходу</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>База знаний</h3>
+                <p>Доступ к обширной базе знаний по уходу за различными видами растений</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Как работает -->
+<section id="how-it-works" class="how-it-works">
+    <div class="container">
+        <h2>Как работает PlantCare</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Добавьте растения</h3>
+                <p>Выберите растения из каталога и добавьте в избранное</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Настройте уход</h3>
+                <p>Установите график полива и удобрения</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Получайте напоминания</h3>
+                <p>Система уведомит вас, когда придет время ухода за растениями</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Отслеживайте прогресс</h3>
+                <p>Ведите дневник с фотографиями и отмечайте достижения</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Призыв к действию -->
+<section class="cta">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Начните заботиться о растениях правильно</h2>
+            <p>Присоединяйтесь к сообществу PlantCare сегодня</p>
+            {% if not current_user.is_authenticated %}
+                <button class="btn btn-primary" id="createAccBtn">Создать аккаунт</button>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Футер -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="logo">
+                    <i class="fas fa-leaf"></i>
+                    <span>PlantCare</span>
+                </div>
+                <p>Умный помощник для любителей растений</p>
+            </div>
+            <div class="footer-section">
+                <h4>Возможности(в разработке)</h4>
+                <a href="#">Коллекция растений</a>
+                <a href="#">Напоминания о поливе</a>
+                <a href="#">Дневник роста</a>
+            </div>
+            <div class="footer-section">
+                <h4>Поддержка(в разработке)</h4>
+                <a href="#">Помощь</a>
+                <a href="#">База знаний</a>
+                <a href="#">Контакты</a>
+            </div>
+            <div class="footer-section">
+                <h4>Сообщество(в разработке)</h4>
+                <a href="#">Блог</a>
+                <a href="#">Форум</a>
+                <a href="#">Галерея</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Модальное окно входа -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Вход в аккаунт</h2>
+        <form class="auth-form">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" name="email" placeholder="Введите ваш email" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Пароль</label>
+                <input type="password" id="loginPassword" name="password" placeholder="Введите пароль" required>
+            </div>
+
+            <div class="error-message" id="loginError" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="loginErrorText"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Войти</button>
+        </form>
+        <div class="auth-links">
+            <a href="#">Забыли пароль?</a>
+            <p>Нет аккаунта? <a href="#" class="switch-to-register">Зарегистрироваться</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно регистрации -->
+<div id="registerModal" class="modal">
+    <div class="modal-content"> 
+        <span class="close">&times;</span>
+        <h2>Регистрация</h2>
+        <form class="auth-form">
+            <div class="form-group">
+                <label for="regName">Имя</label>
+                <input type="text" name="name" id="regName" placeholder="Введите ваше имя" required>
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email</label>
+                <input type="email" name="email" id="regEmail" placeholder="Введите ваш email" required>
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Пароль</label>
+                <input type="password" name="password" id="regPassword" placeholder="Создайте пароль" required>
+            </div>
+            <div class="form-group">
+                <label for="regConfirmPassword">Подтвердите пароль</label>
+                <input type="password" id="regConfirmPassword" placeholder="Повторите пароль" required>
+            </div>
+            <div class="error-message" id="passwordError" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Пароли не совпадают</span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Зарегистрироваться</button>
+        </form>
+        <div class="auth-links">
+            <p>Уже есть аккаунт? <a href="#" class="switch-to-login">Войти</a></p>
+        </div>
+    </div>
+</div>
+<style>
+.hero-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.plant-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f0f0f0;
+    width: 100%;
+    max-width: 350px;
+}
+
+.plant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.plant-image {
+    height: 200px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: #ccc;
+    transition: all 0.3s ease;
+}
+
+.favorite-btn:hover {
+    color: #ff4757;
+}
+
+.plant-care-level {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    background: #4caf50;
+}
+
+.plant-info {
+    padding: 1.5rem;
+}
+
+.plant-info h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.plant-latin {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.plant-details-combined {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-combined {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.detail-icon {
+    font-size: 1.2rem;
+    width: 25px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.detail-text {
+    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.plant-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-care {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #4caf50;
+    color: #4caf50;
+}
+
+.btn-outline:hover {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+</style>
+
+<script>
+console.log('PlantCare JS loaded');
+
+const loginModal = document.getElementById('loginModal');
+const registerModal = document.getElementById('registerModal');
+
+const loginBtn = document.getElementById('navLogin');
+const registerBtn = document.getElementById('navRegister');
+console.log('Found buttons:', loginBtn, registerBtn);
+
+// Обработчики для кнопок навигации
+loginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginModal.style.display = 'block';
+});
+
+registerBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    registerModal.style.display = 'block';
+});
+
+// Кнопка "Начать сейчас"
+const startNowBtn = document.getElementById('startNowBtn');
+if (startNowBtn) {
+    startNowBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerModal.style.display = 'block';
+    });
+}
+
+// Закрытие модальных окон
+const closeBtns = document.querySelectorAll('.close');
+closeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        loginModal.style.display = 'none';
+        registerModal.style.display = 'none';
+    });
+});
+
+// Переключение между окнами
+const switchToRegister = document.querySelector('.switch-to-register');
+const switchToLogin = document.querySelector('.switch-to-login');
+
+if (switchToRegister) {
+    switchToRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.style.display = 'none';
+        registerModal.style.display = 'block';
+    });
+}
+
+if (switchToLogin) {
+    switchToLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerModal.style.display = 'none';
+        loginModal.style.display = 'block';
+    });
+}
+
+// Закрытие при клике вне окна
+window.addEventListener('click', (e) => {
+    if (e.target === loginModal) loginModal.style.display = 'none';
+    if (e.target === registerModal) registerModal.style.display = 'none';
+});
+
+// Обработка форм
+const loginForm = document.querySelector('#loginModal form');
+const registerForm = document.querySelector('#registerModal form');
+
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('regConfirmPassword').value;
+        const passwordError = document.getElementById('passwordError');
+        const confirmInput = document.getElementById('regConfirmPassword');
+        
+        // Сбрасываем стили ошибок
+        passwordError.style.display = 'none';
+        confirmInput.classList.remove('error');
+        
+        if (password !== confirmPassword) {
+            passwordError.style.display = 'flex';
+            confirmInput.classList.add('error');
+            confirmInput.focus();
+            return;
+        }
+        
+        // Если нужна дополнительная валидация
+        if (password.length < 6) {
+            passwordError.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Пароль должен быть не менее 6 символов</span>';
+            passwordError.style.display = 'flex';
+            document.getElementById('regPassword').classList.add('error');
+            return;
+        }
+
+        const formData = new FormData(registerForm);
+        try {
+            const response = await fetch('api/register', {
+                method: 'POST',
+                body: formData
+            })
+
+            const result = await response.json();
+            if (result.success) {
+                registerModal.style.display = 'none';
+                window.location.href = '/profile';
+            } else{
+                const emailError = document.getElementById('emailError');
+                const emailInput = document.getElementById('regEmail');
+
+                if (!emailError) {
+                    // Создаем элемент ошибки если его нет
+                    const errorDiv = document.createElement('div');
+                    errorDiv.id = 'emailError';
+                    errorDiv.className = 'error-message';
+                    emailInput.parentNode.appendChild(errorDiv);
+                }
+                
+                document.getElementById('emailError').innerHTML = 
+                    `<i class="fas fa-exclamation-circle"></i><span>${result.message}</span>`;
+                document.getElementById('emailError').style.display = 'flex';
+                emailInput.classList.add('error');
+            }
+        } catch (error) {
+            alert('Ошибка сети, попробуйте еще раз');
+        }
+    });
+}
+
+// Дополнительно: валидация в реальном времени
+const confirmPasswordInput = document.getElementById('regConfirmPassword');
+if (confirmPasswordInput) {
+    confirmPasswordInput.addEventListener('input', function() {
+        const password = document.getElementById('regPassword').value;
+        const passwordError = document.getElementById('passwordError');
+        
+        if (this.value !== password && this.value.length > 0) {
+            passwordError.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Пароли не совпадают</span>';
+            passwordError.style.display = 'flex';
+            this.classList.add('error');
+        } else {
+            passwordError.style.display = 'none';
+            this.classList.remove('error');
+        }
+    });
+}
+
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const loginError = document.getElementById('loginError');
+        loginError.style.display = 'none';
+
+        const formData = new FormData(loginForm);
+        
+        try {
+            const response = await fetch('api/login', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                loginModal.style.display = 'none';
+                window.location.href = '/profile';  // Переходим в профиль
+            } else {
+                // Показываем ошибку входа
+                loginError.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + result.message + '</span>';
+                loginError.style.display = 'flex';
+            }
+        } catch (error) {
+            loginError.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Ошибка сети, попробуйте еще раз</span>';
+            loginError.style.display = 'flex';
+        }
+    });
+}
+
+const createAccBtn = document.getElementById('createAccBtn')
+if (createAccBtn) {
+    createAccBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerModal.style.display = 'block';
+    });
+}
+
+
+console.log('PlantCare initialization complete');
+</script>
+
+{% endblock %}

@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - PlantCare{% endblock %}
+{% block body %}
+
+<!-- Основной контент профиля -->
+<div class="profile-container">
+    <div class="container">
+        <!-- Заголовок профиля -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.name }}</h1>
+                <p class="profile-email">{{ user.email }}</p>
+                <p class="profile-join">Участник с {{ russian_date(user.date) }}</p>
+                <div class="telegram-connected">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram подключен(в разработке)</span>
+                </div>
+            </div>
+            <div class="profile-stats">
+                <div class="stat">
+                    <div class="stat-number">{{favorite_count}}</div>
+                    {%if favorite_count%10 == 1%}
+                        <div class="stat-label">избранное</div>
+                    {%else%}
+                        <div class="stat-label">избранных</div>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+
+        <!-- Ближайшие уходы -->
+        <section class="upcoming-care">
+            <h2>Ближайшие уходы(в разработке)</h2>
+        </section>
+
+        <!-- Избранные растения -->
+        <section id="favorites" class="favorites-section">
+            <div class="section-header">
+                <h2>Избранные растения</h2>
+                <div class="section-actions">
+                    <a href="/plants" class="btn btn-outline">
+                        <i class="fas fa-search"></i> Все растения
+                    </a>
+                </div>
+            </div>
+                <div class="plants-grid">
+                    {% if favorite_plants %}
+                        {% for plant in favorite_plants %}
+                        <div class="plant-card" 
+                            data-name="{{ plant.name }}"
+                            data-latin="{{ plant.latin_name }}"
+                            data-image="{{ plant.image_url }}"
+                            data-difficulty="{{ plant.difficulty }}"
+                            data-type="{{ plant.plant_type }}"
+                            data-lifespan="{{ plant.lifespan }}"
+                            data-light="{{ plant.light }}"
+                            data-water="{{ plant.water_frequency }}"
+                            data-description="{{ plant.description }}"
+                            data-additional-care="{{ plant.care_instructions }}"
+                            data-temperature="{{ plant.temperature }}">
+                            <div class="plant-image" style="background-image: url('{{ plant.image_url }}');">
+                                <button class="favorite-btn active" data-plant-id="{{ plant.id }}">
+                                    ♥
+                                </button>
+                                <div class="plant-care-level" data-difficulty="{{ plant.difficulty }}">{{ plant.difficulty }}</div>
+                            </div>
+                            <div class="plant-info">
+                                <h3>{{ plant.name }}</h3>
+                                <p class="plant-latin">{{ plant.latin_name }}</p>
+                                <div class="plant-actions">
+                                    <button class="btn-care btn-outline view-details" data-id="{{ plant.id }}">Подробнее</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    {% endif %}
+                </div>
+        </section>
+
+        <!-- Рекомендации -->
+        <section class="recommendations">
+            <h2>Персональные рекомендации</h2>
+            <div class="recommendations-grid">
+                <div class="recommendation-card">
+                    <div class="rec-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>График ухода</h3>
+                    <p>Оптимизируйте расписание полива и удобрения ваших растений</p>
+                    <button class="btn btn-outline" id="sheduleBtn">Настроить</button>
+                </div>
+                <div class="recommendation-card">
+                    <div class="rec-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Статьи по уходу(в разработке)</h3>
+                    <p>Новые материалы по уходу за комнатными растениями</p>
+                    <button class="btn btn-outline">Читать</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+</div>
+
+
+<style>
+/* Избранные растения */
+.section-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ff4757;
+    transition: all 0.3s ease;
+}
+
+.favorite-btn.active {
+    color: #ff4757;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+}
+
+.plant-care-level {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+}
+
+.plant-latin {
+    color: var(--text-light);
+    font-style: italic;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.plant-care-info {
+    margin-bottom: 1rem;
+}
+
+.care-tip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.plant-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.btn-care {
+    flex: 1;
+    padding: 0.5rem 1rem; /* Большие кнопки */
+    border: none;
+    border-radius: 12px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 1rem; /* Крупный текст кнопок */
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #4caf50;
+    color: #4caf50;
+}
+.btn-outline:hover {
+    background: #4caf50;
+    color: white;
+}
+
+/* Рекомендации */
+.recommendations {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.recommendation-card {
+    background: var(--background);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.rec-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.recommendation-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.recommendation-card p {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.plant-image {
+    height: 150px; /* Еще компактнее */
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+}
+</style>
+{% include "plant_modal.html" %}
+<script>
+// JS для страницы профиля
+document.addEventListener('DOMContentLoaded', function() {
+    const detailBtns = document.querySelectorAll('.view-details');
+    detailBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const plantId = this.dataset.id;
+            showPlantDetails(plantId);
+        });
+    });
+    // Кнопка выхода
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                alert('Выход выполнен (функция в разработке)');
+                window.location.href = '/';
+            }
+        });
+    }
+
+    // Кнопка избранного
+    const favoriteBtns = document.querySelectorAll('.favorite-btn');
+    favoriteBtns.forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const plantId = this.dataset.plantId;
+            const plantName = this.closest('.plant-card').querySelector('h3').textContent;
+            
+            try {
+                const response = await fetch(`/api/remove-from-favorites/${plantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    // Удаляем карточку из DOM
+                    this.closest('.plant-card').remove();
+                    showNotification(result.message, 'success');
+                    
+                    // Если растений не осталось, показываем пустое состояние
+                    const remainingCards = document.querySelectorAll('.plant-card');
+                    if (remainingCards.length === 0) {
+                        showEmptyState();
+                    }
+                } else {
+                    showNotification(result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Ошибка сети, попробуйте еще раз', 'error');
+                console.error('Ошибка:', error);
+            }
+        });
+    });
+    const sheduleBtn = document.getElementById("sheduleBtn")
+    sheduleBtn.addEventListener('click', async function(){
+        const plantId = this.dataset.id;
+            window.location.href = '/calendar';
+    })
+});
+</script>
+
+{% endblock %}

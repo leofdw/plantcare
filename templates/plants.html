@@ -1,0 +1,659 @@
+{% extends "base.html" %}
+
+{% block title %}Каталог растений - PlantCare{% endblock %}
+
+{% block body %}
+<!-- Основной контент -->
+<div class="plants-container">
+    <div class="container">
+        <!-- Заголовок и фильтры -->
+        <div class="plants-header">
+            <div class="header-content">
+                <div>
+                    <h1>Каталог растений</h1>
+                    <p>Изучайте базу растений и добавляйте понравившиеся в избранное</p>
+                </div>
+                <div class="filters">
+                    <select class="filter-select" id="typeFilter">
+                        <option value="">Все типы</option>
+                        <option value="комнатное">Комнатные</option>
+                        <option value="садовое">Садовые</option>
+                        <option value="балконное">Балконные</option>
+                    </select>
+                    
+                    <select class="filter-select" id="careFilter">
+                        <option value="">Любая сложность</option>
+                        <option value="Лёгкий">Лёгкий</option>
+                        <option value="Средний">Средний</option>
+                        <option value="Сложный">Сложный</option>
+                    </select>
+                    
+                    <select class="filter-select" id="lifespanFilter">
+                        <option value="">Любая продолжительность</option>
+                        <option value="однолетнее">Однолетние</option>
+                        <option value="двулетнее">Двулетние</option>
+                        <option value="многолетнее">Многолетние</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Поиск -->
+        <div class="search-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="plantSearch" placeholder="Поиск растений...">
+            </div>
+        </div>
+
+       <!-- Сетка растений -->
+        <div class="plants-grid" id="plantsGrid">
+            {% for plant in plants %}
+            <div class="plant-card" 
+                data-name="{{ plant.name }}"
+                data-latin="{{ plant.latin_name }}"
+                data-image="{{ plant.image_url }}"
+                data-care="{{ plant.difficulty }}" 
+                data-light="{{ plant.light }}"
+                data-water="{{ plant.water_frequency }}"
+                data-description="{{ plant.description }}"
+                data-additional-care="{{ plant.care_instructions }}"
+                data-temperature="{{ plant.temperature }}"
+                data-type="{{ plant.plant_type }}"
+                data-lifespan="{{ plant.lifespan }}">
+                <div class="plant-image" style="background-image: url('{{ plant.image_url }}');">
+                    <button class="favorite-btn {% if plant.id in favorite_plant_ids %}active{% endif %}" 
+                            data-plant-id="{{ plant.id }}">
+                        ♥
+                    </button>
+                    <div class="plant-care-level" data-difficulty="{{ plant.difficulty }}">
+                        {{ plant.difficulty }}
+                    </div>
+                </div>
+                <div class="plant-info">
+                    <h3>{{ plant.name }}</h3>
+                    <p class="plant-latin">{{ plant.latin_name }}</p>
+                    
+                    <!-- Только тип и продолжительность жизни -->
+                    <div class="plant-details-combined">
+                        <div class="detail-combined">
+                            <div class="detail-icon">🌿</div>
+                            <div class="detail-text">{{ plant.plant_type }}</div>
+                        </div>
+                        <div class="detail-combined">
+                            <div class="detail-icon">📅</div>
+                            <div class="detail-text">{{ plant.lifespan }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="plant-actions">
+                        <button class="btn-care btn-outline view-details" data-id="{{ plant.id }}">Подробнее</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Кнопка добавления для админа -->
+            <div class="plant-card add-card hidden" id="add-plant-card">
+                <div class="add-card-content">
+                    <div class="add-icon">+</div>
+                    <h3>Добавить растение</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+/* Стили для страницы растений */
+.plants-container {
+    padding: 2rem 0;
+    background: var(--background);
+    min-height: 100vh;
+}
+
+.plants-header {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+}
+
+.header-content h1 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-dark);
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.filter-label {
+    font-weight: 600;
+    color: #2d5a27;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+.filter-select option:hover {
+    background: #4caf50 !important;
+    color: white !important;
+}
+.filter-select option:checked {
+    background: #e8f5e8 !important;
+    color: #2d5a27 !important;
+    font-weight: 600;
+}
+/* Стили для красивых выпадающих меню */
+.filter-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: white;
+    font-size: 0.9rem;
+    min-width: 160px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    appearance: none; /* Убираем стандартный стиль */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8.5L1.5 4h9L6 8.5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+    position: relative;
+    z-index: 1;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.filter-select option {
+    padding: 0.75rem 1rem;
+    background: white;
+    border: none;
+    font-size: 0.9rem;
+}
+.filter-select:focus {
+    border-color: #4caf50;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234caf50' d='M6 8.5L1.5 4h9L6 8.5z'/%3E%3C/svg%3E");
+}
+.filter-select:hover {
+    border-color: #bdbdbd;
+}
+.filter-select:active {
+    border-color: #45a049;
+}
+.search-section {
+    margin-bottom: 2rem;
+}
+.filter-select::-ms-expand {
+    display: none; /* Скрываем стрелку в IE */
+}
+
+.search-box {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.plants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); /* Широкие карточки */
+    gap: 2.5rem;
+}
+
+.plant-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f0f0f0;
+    min-height: 520px; /* Высокие карточки */
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Занимают всю доступную ширину */
+}
+
+.plant-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+.plant-details-combined {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem; /* Больше расстояния */
+    margin-bottom: 2rem;
+    flex-grow: 1;
+}
+.plant-image {
+    height: 280px; /* Очень высокое фото */
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+}
+.favorite-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: #ccc;
+    transition: all 0.3s ease;
+}
+.detail-combined {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Больше расстояния между иконкой и текстом */
+    padding: 1rem; /* Больше внутренних отступов */
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    min-height: 70px; /* Высокие блоки */
+}
+
+.detail-combined:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.detail-icon {
+    font-size: 1.5rem; /* Крупные иконки */
+    width: 35px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.detail-text {
+    font-size: 1.1rem; /* Крупный текст */
+    color: #495057;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    flex-grow: 1;
+    white-space: normal;
+    overflow: visible;
+    word-break: normal; /* Естественные переносы */
+    hyphens: auto;
+}
+.plant-care-level {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+}
+.plant-info {
+    padding: 2rem; /* Больше отступов */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+}
+.plant-info h3 {
+    font-size: 1.5rem; /* Крупный заголовок */
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+.detail {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+.plant-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+/* Адаптивность */
+@media (max-width: 768px) {
+    .plants-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .plant-card {
+        min-height: 480px;
+    }
+    
+    .plant-image {
+        height: 250px;
+    }
+    .filters {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-select {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .plant-details-combined {
+        grid-template-columns: 1fr;
+    }
+    
+    .detail-combined {
+        min-height: 60px;
+    }
+    
+    .detail-text {
+        font-size: 1rem;
+    }
+    .filters {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+}
+.add-card {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 200px;
+}
+
+.add-card:hover {
+    background: #e9ecef;
+    border-color: #4caf50;
+    transform: translateY(-2px);
+}
+
+.add-card-content {
+    text-align: center;
+    color: #6c757d;
+}
+
+.add-icon {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.add-card:hover .add-icon {
+    color: #4caf50;
+}
+
+.add-card h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Скрываем для не-админов */
+.add-card.hidden {
+ 
+    display: none;
+}
+.plant-latin {
+    font-style: italic;
+    color: #666;
+    font-size: 1rem; /* Крупный текст */
+    margin-bottom: 1.5rem;
+    line-height: 1.3;
+}
+.btn-care {
+    flex: 1;
+    padding: 1rem 1.5rem; /* Большие кнопки */
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 1rem; /* Крупный текст кнопок */
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #4caf50;
+    color: #4caf50;
+}
+.btn-outline:hover {
+    background: #4caf50;
+    color: white;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+</style>
+{% include "plant_modal.html" %}
+<script>
+// JS для страницы растений
+document.addEventListener('DOMContentLoaded', function() {
+    // Элементы
+    const searchInput = document.getElementById('plantSearch');
+    const plantsGrid = document.getElementById('plantsGrid');
+
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        const backgroundColor = type === 'success' ? 'var(--primary)' : '#f44336';
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${backgroundColor};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Кнопки избранного
+    const favoriteBtns = document.querySelectorAll('.favorite-btn');
+    favoriteBtns.forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const plantId = this.dataset.plantId;
+            const plantName = this.closest('.plant-card').querySelector('h3').textContent;
+            const isCurrentlyFavorite = this.classList.contains('active');
+            
+            try {
+                if (isCurrentlyFavorite) {
+                    // Удаляем из избранного
+                    const response = await fetch(`/api/remove-from-favorites/${plantId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        this.classList.remove('active');
+                        showNotification(result.message, 'success');
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                } else {
+                    // Добавляем в избранное
+                    const response = await fetch(`api/add-to-favorites/${plantId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        this.classList.add('active');
+                        showNotification(result.message, 'success');
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                }
+            } catch (error) {
+                showNotification('Ошибка сети, попробуйте еще раз', 'error');
+                console.error('Ошибка:', error);
+            }
+        });
+    });
+
+    // Кнопки "Подробнее"
+    const detailBtns = document.querySelectorAll('.view-details');
+    detailBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const plantId = this.dataset.id;
+            showPlantDetails(plantId);
+        });
+    });
+
+    const typeFilter = document.getElementById('typeFilter');
+    const careFilter = document.getElementById('careFilter');
+    const lifespanFilter = document.getElementById('lifespanFilter');
+    const lightFilter = document.getElementById('lightFilter');
+
+    function filterPlants() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const typeValue = typeFilter.value;
+        const careValue = careFilter.value;
+        const lifespanValue = lifespanFilter.value;
+        
+        const plantCards = plantsGrid.querySelectorAll('.plant-card:not(.add-card)');
+        
+        plantCards.forEach(card => {
+            const plantName = card.dataset.name.toLowerCase();
+            const plantLatin = card.dataset.latin.toLowerCase();
+            const plantType = card.dataset.type;
+            const plantCare = card.dataset.care;
+            const plantLifespan = card.dataset.lifespan;
+            
+            const matchesSearch = plantName.includes(searchTerm) || plantLatin.includes(searchTerm);
+            const matchesType = !typeValue || plantType === typeValue;
+            const matchesCare = !careValue || plantCare === careValue;
+            const matchesLifespan = !lifespanValue || plantLifespan === lifespanValue;
+            
+            if (matchesSearch && matchesType && matchesCare && matchesLifespan) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    typeFilter.addEventListener('change', filterPlants);
+    careFilter.addEventListener('change', filterPlants);
+    lifespanFilter.addEventListener('change', filterPlants);
+    searchInput.addEventListener('input', filterPlants);
+
+        // Показ деталей растения
+
+    async function setupAddPlantButton() {
+        try {
+            const response = await fetch('/api/is_admin');
+            const userData = await response.json();
+
+            if (userData.is_admin) {
+                const addButton = document.getElementById('add-plant-card');
+                addButton.classList.remove('hidden');
+                addButton.onclick = function(){
+                    window.location.href = '/add-plant';
+                }
+            }
+        } catch(error) {
+            console.log('Ошибка проверки админа:', error);
+        }
+    }
+    setupAddPlantButton()
+    // Автоматический поиск при загрузке (если есть ?search=)
+    function autoSearchFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('search');
+        if (searchParam) {
+            searchInput.value = decodeURIComponent(searchParam);
+            filterPlants(); // Применяем фильтрацию
+            // Необязательно: прокрутка к результатам
+            plantsGrid.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // Запускаем при загрузке
+    autoSearchFromURL();
+
+});
+</script>
+
+{% endblock %}
