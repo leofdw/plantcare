@@ -474,7 +474,21 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
 }
+.btn-delete {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    margin-left: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
 
+.btn-delete:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
 </style>
 {% include "plant_modal.html" %}
 <script>
@@ -637,7 +651,51 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Ошибка проверки админа:', error);
         }
     }
-    setupAddPlantButton()
+    async function setupDeletePlantButtons() {
+        try {
+            const response = await fetch('/api/is_admin');
+            const userData = await response.json();
+
+            if (!userData.is_admin) return;
+
+            document.querySelectorAll('.view-details').forEach(btn => {
+                const plantId = btn.dataset.id;
+                const plantName = btn.closest('.plant-card')?.dataset.name || 'Растение';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-care btn-delete';
+                deleteBtn.dataset.plantId = plantId;
+                deleteBtn.dataset.plantName = plantName;
+                deleteBtn.innerHTML = '🗑 Удалить';
+                btn.parentNode.appendChild(deleteBtn);
+
+                deleteBtn.addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    if (!confirm(`Удалить "${plantName}"?`)) return;
+
+                    try {
+                        const res = await fetch(`/api/delete-plant/${plantId}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        const result = await res.json();
+                        if (res.ok) {
+                            alert(result.message);
+                            btn.closest('.plant-card').remove();
+                        } else {
+                            alert('Ошибка: ' + result.message);
+                        }
+                    } catch (error) {
+                        alert('Ошибка сети');
+                    }
+                });
+            });
+        } catch (error) {
+            console.log('Ошибка проверки админа:', error);
+        }
+    }
+    setupAddPlantButton();
+    setupDeletePlantButtons();
     // Автоматический поиск при загрузке (если есть ?search=)
     function autoSearchFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -655,5 +713,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
+
 
 {% endblock %}
