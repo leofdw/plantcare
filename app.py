@@ -238,6 +238,9 @@ def api_delete_plant(plant_id):
         if not plant:
             return jsonify({'success':False, 'message':'Растение не найдено'}), 404
         try:
+            FavoritePlant.query.filter_by(plant_id=plant.id).delete()
+            FertilizationSchedule.query.filter_by(plant_id=plant.id).delete()
+            WateringSchedule.query.filter_by(plant_id=plant.id).delete()
             db.session.delete(plant)
             db.session.commit()
             return jsonify({'success':True, 'message':f'Растение {plant.name} удалено'})
@@ -444,6 +447,7 @@ def save_fertilization():
 if __name__ == '__main__':
 
     app.run()
+
 
 
 
