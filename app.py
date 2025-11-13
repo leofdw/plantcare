@@ -218,7 +218,7 @@ def api_add_plant():
                 plant_type=form_data['plant_type'], lifespan=form_data['lifespan'],
                 light=form_data['light'], difficulty=form_data['difficulty'],
                 care_instructions=form_data.get('care_instructions'), 
-                water_frequency=form_data['water_frequency'], temperature=f'{form_data['temperature']}°C'
+                water_frequency=form_data['water_frequency'], temperature=f"{form_data['temperature']}°C"
             )
     
             db.session.add(plant)   
@@ -430,4 +430,5 @@ def save_fertilization():
         print(f"[ERROR] save_fertilization: {e}")
         return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
 if __name__ == '__main__':
+
     app.run()
